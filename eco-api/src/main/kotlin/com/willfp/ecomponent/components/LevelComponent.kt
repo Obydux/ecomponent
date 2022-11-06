@@ -19,6 +19,7 @@ enum class LevelState {
     LOCKED
 }
 
+@Suppress("MemberVisibilityCanBePrivate")
 abstract class LevelComponent(
     pattern: List<String>,
     maxLevel: Int
@@ -26,13 +27,13 @@ abstract class LevelComponent(
     private var _rows by Delegates.notNull<Int>()
     private var _columns by Delegates.notNull<Int>()
 
-    private val slots = mutableMapOf<GUIPosition, Slot>()
+    private val slots = mutableMapOf<Int, MutableMap<GUIPosition, Slot>>()
 
     override fun getRows() = _rows
     override fun getColumns() = _columns
 
-    override fun getSlotAt(row: Int, column: Int): Slot? {
-        return slots[GUIPosition(row, column)]
+    override fun getSlotAt(row: Int, column: Int, player: Player, menu: Menu): Slot? {
+        return slots[menu.getPage(player)]?.get(GUIPosition(row, column))
     }
 
     override fun init(maxRows: Int, maxColumns: Int) {
@@ -40,8 +41,8 @@ abstract class LevelComponent(
         this._columns = maxColumns
     }
 
-    private var levelsPerPage by Delegates.notNull<Int>()
-    private var pages by Delegates.notNull<Int>()
+    val levelsPerPage: Int
+    val pages: Int
 
     init {
         val progressionSlots = mutableMapOf<Int, GUIPosition>()
@@ -69,24 +70,35 @@ abstract class LevelComponent(
         levelsPerPage = progressionSlots.size
         pages = ceil(maxLevel.toDouble() / levelsPerPage).toInt()
 
-        for ((levelOffset, position) in progressionSlots) {
-            slots[position] = slot { player, menu ->
-                val page = menu.getPage(player)
-
+        for (page in 1..pages) {
+            for ((levelOffset, position) in progressionSlots) {
                 val level = ((page - 1) * levelsPerPage) + levelOffset
 
-                getLevelItem(
-                    player,
-                    menu,
-                    getLevelState(
+                if (level > maxLevel) {
+                    continue
+                }
+
+                val pageSlots = slots[page] ?: mutableMapOf()
+
+                pageSlots[position] = slot { player, menu ->
+                    getLevelItem(
                         player,
-                        level
+                        menu,
+                        level,
+                        getLevelState(
+                            player,
+                            level
+                        )
                     )
-                )
+                }
+
+                slots[page] = pageSlots
             }
         }
+
+        println(slots)
     }
 
-    abstract fun getLevelItem(player: Player, menu: Menu, levelState: LevelState): ItemStack
+    abstract fun getLevelItem(player: Player, menu: Menu, level: Int, levelState: LevelState): ItemStack
     abstract fun getLevelState(player: Player, level: Int): LevelState
 }
