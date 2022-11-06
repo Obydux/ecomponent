@@ -1,0 +1,4 @@
+rootProject.name = 'ecomponent'
+
+// Core
+include ':eco-api'
