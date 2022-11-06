@@ -95,8 +95,6 @@ abstract class LevelComponent(
                 slots[page] = pageSlots
             }
         }
-
-        println(slots)
     }
 
     abstract fun getLevelItem(player: Player, menu: Menu, level: Int, levelState: LevelState): ItemStack
