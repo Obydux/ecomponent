@@ -88,5 +88,5 @@ abstract class LevelComponent(
     }
 
     abstract fun getLevelItem(player: Player, menu: Menu, levelState: LevelState): ItemStack
-    abstract fun getLevelState(player: Player, int: Int): LevelState
+    abstract fun getLevelState(player: Player, level: Int): LevelState
 }
