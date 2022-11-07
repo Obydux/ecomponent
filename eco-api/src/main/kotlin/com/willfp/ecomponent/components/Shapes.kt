@@ -28,10 +28,6 @@ private enum class LineDirection {
     HORIZONTAL
 }
 
-/*
-Vertical Lines.
- */
-
 
 /**
  * Create a vertical line of identical [slot]s. Takes the maximum height
@@ -43,11 +39,6 @@ fun verticalLine(slot: Slot?): GUIComponent = verticalLine(Int.MAX_VALUE, slot)
 fun verticalLine(maxSize: Int, slot: Slot?): GUIComponent = LineComponent(LineDirection.VERTICAL, maxSize, slot)
 
 
-/*
-Horizontal Lines.
- */
-
-
 /**
  * Create a horizontal line of identical [slot]s. Takes the maximum height
  * possible.
@@ -57,11 +48,6 @@ fun horizontalLine(slot: Slot?): GUIComponent = horizontalLine(Int.MAX_VALUE, sl
 /** Create a horizontal line of identical [slot]s, with a [maxSize]. */
 fun horizontalLine(maxSize: Int, slot: Slot?): GUIComponent =
     LineComponent(LineDirection.HORIZONTAL, maxSize, slot)
-
-
-/*
-Rectangles.
- */
 
 
 /**
