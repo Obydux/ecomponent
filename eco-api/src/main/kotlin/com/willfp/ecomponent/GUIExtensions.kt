@@ -6,7 +6,10 @@ import com.willfp.eco.core.gui.slot.Slot
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 
+/** An action when clicking a slot. */
 typealias SlotAction = (Player, event: InventoryClickEvent, Slot, Menu) -> Unit
+
+/** Creating a slot given a player and a menu. */
 typealias SlotProvider = (Player, Menu) -> Slot?
 
 private class OrElseGUIComponent(
