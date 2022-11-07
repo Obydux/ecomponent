@@ -1,44 +1,41 @@
 package com.willfp.ecomponent.components
 
-import com.willfp.eco.core.gui.GUIComponent
 import com.willfp.eco.core.gui.menu.Menu
 import com.willfp.eco.core.gui.slot
 import com.willfp.eco.core.gui.slot.Slot
+import com.willfp.ecomponent.AutofillComponent
 import com.willfp.ecomponent.GUIPosition
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import kotlin.math.ceil
-import kotlin.properties.Delegates
 
-// Jank? Feature.
+/** The order of the level progression. */
 private val progressionOrder = "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray()
 
-enum class LevelState {
-    UNLOCKED,
-    IN_PROGRESS,
-    LOCKED
+/** The state of each level. */
+enum class LevelState(
+    val key: String
+) {
+    /** Level is unlocked / complete. */
+    UNLOCKED("unlocked"),
+
+    /** Level is currently being worked on. */
+    IN_PROGRESS("in-progress"),
+
+    /** Level has yet to be worked on. */
+    LOCKED("locked")
 }
 
+/** Component to display level progression, for Skills/Jobs/etc. */
 @Suppress("MemberVisibilityCanBePrivate")
 abstract class LevelComponent(
     pattern: List<String>,
     maxLevel: Int
-) : GUIComponent {
-    private var _rows by Delegates.notNull<Int>()
-    private var _columns by Delegates.notNull<Int>()
-
+) : AutofillComponent() {
     private val slots = mutableMapOf<Int, MutableMap<GUIPosition, Slot>>()
-
-    override fun getRows() = _rows
-    override fun getColumns() = _columns
 
     override fun getSlotAt(row: Int, column: Int, player: Player, menu: Menu): Slot? {
         return slots[menu.getPage(player)]?.get(GUIPosition(row, column))
-    }
-
-    override fun init(maxRows: Int, maxColumns: Int) {
-        this._rows = maxRows
-        this._columns = maxColumns
     }
 
     val levelsPerPage: Int
@@ -97,6 +94,9 @@ abstract class LevelComponent(
         }
     }
 
+    /** Get the item to be shown given a specific [level] and [levelState]. */
     abstract fun getLevelItem(player: Player, menu: Menu, level: Int, levelState: LevelState): ItemStack
+
+    /** Get the state given a [player]'s [level]. */
     abstract fun getLevelState(player: Player, level: Int): LevelState
 }
