@@ -1,7 +1,9 @@
 package com.willfp.ecomponent
 
+import com.willfp.eco.core.gui.GUIComponent
 import com.willfp.eco.core.gui.menu.Menu
 import com.willfp.eco.core.gui.menu.MenuBuilder
+import com.willfp.eco.core.gui.menu.MenuLayer
 import com.willfp.eco.core.gui.slot.Slot
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -27,6 +29,7 @@ class CaptiveItem {
     /** Get the item for a player. */
     operator fun get(player: Player): ItemStack? {
         require(isBound) { "Must be bound to an item!" }
+
         return menu.getCaptiveItem(player, row, column)
     }
 }
@@ -37,14 +40,50 @@ fun MenuBuilder.setSlot(
     column: Int,
     slot: Slot,
     bindCaptive: CaptiveItem? = null
+) = addComponent(row, column, slot, bindCaptive = bindCaptive)
+
+/** @see addComponent */
+fun MenuBuilder.addComponent(
+    row: Int,
+    column: Int,
+    slot: Slot,
+    bindCaptive: CaptiveItem? = null
+) = addComponent(MenuLayer.MIDDLE, row, column, slot, bindCaptive = bindCaptive)
+
+/**
+ * Set a [component] at a [row] and [column] on a [layer] and optionally
+ * bind it to an item.
+ */
+fun MenuBuilder.addComponent(
+    layer: MenuLayer,
+    row: Int,
+    column: Int,
+    component: GUIComponent,
+    bindCaptive: CaptiveItem? = null
 ) {
-    this.setSlot(
+    this.addComponent(
+        layer,
         row,
         column,
-        slot
+        component
     )
 
+    if (bindCaptive != null) {
+        this.bind(
+            row,
+            column,
+            bindCaptive
+        )
+    }
+}
+
+/** Bind a [captiveItem] to a [row] and [column]. */
+fun MenuBuilder.bind(
+    row: Int,
+    column: Int,
+    captiveItem: CaptiveItem
+) {
     this.onBuild {
-        bindCaptive?.bind(it, row, column)
+        captiveItem.bind(it, row, column)
     }
 }
