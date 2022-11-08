@@ -28,7 +28,7 @@ class CaptiveItem {
 
     /** Get the item for a player. */
     operator fun get(player: Player): ItemStack? {
-        require(isBound) { "Must be bound to an item!" }
+        require(isBound) { "Must be bound to a slot!" }
 
         return menu.getCaptiveItem(player, row, column)
     }
