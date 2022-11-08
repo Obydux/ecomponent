@@ -24,6 +24,8 @@ class CaptiveItem {
         this.menu = menu
         this.row = row
         this.column = column
+
+        isBound = true
     }
 
     /** Get the item for a player. */
