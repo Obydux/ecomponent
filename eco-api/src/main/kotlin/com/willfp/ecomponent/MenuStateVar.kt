@@ -10,7 +10,7 @@ interface MenuStateVar<T> {
 }
 
 /** Menu state variable with null as default. */
-class NullableMenuStateVar<T : Any>(
+private class NullableMenuStateVar<T : Any>(
     private val menu: Menu,
     private val key: String
 ) : MenuStateVar<T?> {
@@ -22,7 +22,7 @@ class NullableMenuStateVar<T : Any>(
 }
 
 /** Menu state variable with a fixed default. */
-class NotNullMenuStateVar<T : Any>(
+private class NotNullMenuStateVar<T : Any>(
     private val menu: Menu,
     private val key: String,
     private val default: T
@@ -33,3 +33,16 @@ class NotNullMenuStateVar<T : Any>(
     override operator fun set(player: Player, value: T) =
         menu.setState(player, key, value)
 }
+
+/** Create a menu state variable. */
+fun <T : Any> menuStateVar(
+    menu: Menu,
+    key: String
+): MenuStateVar<T?> = NullableMenuStateVar(menu, key)
+
+/** Create a menu state variable with a [default] value. */
+fun <T : Any> menuStateVar(
+    menu: Menu,
+    key: String,
+    default: T
+): MenuStateVar<T> = NotNullMenuStateVar(menu, key, default)
