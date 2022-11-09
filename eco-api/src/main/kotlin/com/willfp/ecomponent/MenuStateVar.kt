@@ -2,6 +2,7 @@ package com.willfp.ecomponent
 
 import com.willfp.eco.core.gui.menu.Menu
 import org.bukkit.entity.Player
+import java.util.UUID
 
 /** Delegates menu state to a fixed variable. */
 interface MenuStateVar<T> {
@@ -60,4 +61,17 @@ fun <T : Any> menuStateVar(
     default: T
 ) = lazyWithReceiver<Menu, MenuStateVar<T>> {
     menuStateVar(this, key, default)
+}
+
+/** Instant delegate state variable with automatic key generation. */
+fun <T : Any> menuStateVar() = lazyWithReceiver<Menu, MenuStateVar<T?>> {
+    menuStateVar(this, UUID.randomUUID().toString())
+}
+
+/**
+ * Instant delegate state variable with a [default] ad automatic key
+ * generation.
+ */
+fun <T : Any> menuStateVar(default: T) = lazyWithReceiver<Menu, MenuStateVar<T>> {
+    menuStateVar(this, UUID.randomUUID().toString(), default)
 }
