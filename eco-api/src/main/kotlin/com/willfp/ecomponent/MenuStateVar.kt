@@ -4,7 +4,7 @@ import com.willfp.eco.core.gui.menu.Menu
 import org.bukkit.entity.Player
 
 /** Delegate menu state to a fixed variable. */
-class MenuStateVar<T>(
+class MenuStateVar<T : Any>(
     private val menu: Menu,
     private val key: String
 ) {
