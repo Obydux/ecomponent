@@ -46,3 +46,18 @@ fun <T : Any> menuStateVar(
     key: String,
     default: T
 ): MenuStateVar<T> = NotNullMenuStateVar(menu, key, default)
+
+/** Instant delegate state variable. */
+fun <T : Any> menuStateVar(
+    key: String
+) = lazyWithReceiver<Menu, MenuStateVar<T?>> {
+    menuStateVar(this, key)
+}
+
+/** Instant delegate state variable with a [default]. */
+fun <T : Any> menuStateVar(
+    key: String,
+    default: T
+) = lazyWithReceiver<Menu, MenuStateVar<T>> {
+    menuStateVar(this, key, default)
+}
