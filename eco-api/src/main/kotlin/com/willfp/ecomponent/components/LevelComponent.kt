@@ -69,6 +69,8 @@ abstract class LevelComponent : AutofillComponent() {
         }
 
     private fun build() {
+        isBuilt = true
+
         val progressionSlots = mutableMapOf<Int, GUIPosition>()
 
         var x = 0
