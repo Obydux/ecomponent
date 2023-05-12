@@ -40,10 +40,6 @@ abstract class LevelComponent : AutofillComponent() {
         return slots[menu.getPage(player)]?.get(GUIPosition(row, column))
     }
 
-    fun getPage(level: Int): Int {
-        return ceil(level.toDouble() / levelsPerPage).toInt()
-    }
-
     var levelsPerPage by Delegates.notNull<Int>()
         private set
 
@@ -105,6 +101,10 @@ abstract class LevelComponent : AutofillComponent() {
                 slots[page] = pageSlots
             }
         }
+    }
+
+    fun getPageOf(level: Int): Int {
+        return ceil(level.toDouble() / levelsPerPage).toInt()
     }
 
     /** Get the item to be shown given a specific [level] and [levelState]. */
