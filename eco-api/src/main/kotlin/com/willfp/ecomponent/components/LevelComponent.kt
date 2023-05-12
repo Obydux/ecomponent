@@ -32,11 +32,17 @@ enum class LevelState(
 abstract class LevelComponent : AutofillComponent() {
     private val slots = mutableMapOf<Int, MutableMap<GUIPosition, Slot>>()
 
+    private var isBuilt = false
+
     abstract val pattern: List<String>
 
     abstract val maxLevel: Int
 
     override fun getSlotAt(row: Int, column: Int, player: Player, menu: Menu): Slot? {
+        if (!isBuilt) {
+            build()
+        }
+
         return slots[menu.getPage(player)]?.get(GUIPosition(row, column))
     }
 
@@ -45,10 +51,6 @@ abstract class LevelComponent : AutofillComponent() {
 
     var pages by Delegates.notNull<Int>()
         private set
-
-    init {
-        build()
-    }
 
     private fun build() {
         val progressionSlots = mutableMapOf<Int, GUIPosition>()
@@ -104,6 +106,10 @@ abstract class LevelComponent : AutofillComponent() {
     }
 
     fun getPageOf(level: Int): Int {
+        if (!isBuilt) {
+            build()
+        }
+
         return ceil(level.toDouble() / levelsPerPage).toInt()
     }
 
