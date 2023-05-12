@@ -46,11 +46,27 @@ abstract class LevelComponent : AutofillComponent() {
         return slots[menu.getPage(player)]?.get(GUIPosition(row, column))
     }
 
-    var levelsPerPage by Delegates.notNull<Int>()
-        private set
+    private var _levelsPerPage by Delegates.notNull<Int>()
 
-    var pages by Delegates.notNull<Int>()
-        private set
+    val levelsPerPage: Int
+        get() {
+            if (!isBuilt) {
+                build()
+            }
+
+            return _levelsPerPage
+        }
+
+    private var _pages by Delegates.notNull<Int>()
+
+    val pages: Int
+        get() {
+            if (!isBuilt) {
+                build()
+            }
+
+            return _pages
+        }
 
     private fun build() {
         val progressionSlots = mutableMapOf<Int, GUIPosition>()
@@ -75,8 +91,8 @@ abstract class LevelComponent : AutofillComponent() {
             }
         }
 
-        levelsPerPage = progressionSlots.size
-        pages = ceil(maxLevel.toDouble() / levelsPerPage).toInt()
+        _levelsPerPage = progressionSlots.size
+        _pages = ceil(maxLevel.toDouble() / levelsPerPage).toInt()
 
         for (page in 1..pages) {
             for ((levelOffset, position) in progressionSlots) {
