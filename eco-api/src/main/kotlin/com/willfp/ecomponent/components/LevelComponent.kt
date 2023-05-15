@@ -3,6 +3,7 @@ package com.willfp.ecomponent.components
 import com.willfp.eco.core.gui.menu.Menu
 import com.willfp.eco.core.gui.slot
 import com.willfp.eco.core.gui.slot.Slot
+import com.willfp.eco.core.map.nestedMap
 import com.willfp.ecomponent.AutofillComponent
 import com.willfp.ecomponent.GUIPosition
 import org.bukkit.entity.Player
@@ -30,7 +31,9 @@ enum class LevelState(
 /** Component to display level progression, for Skills/Jobs/etc. */
 @Suppress("MemberVisibilityCanBePrivate")
 abstract class LevelComponent : AutofillComponent() {
-    private val slots = mutableMapOf<Int, MutableMap<GUIPosition, Slot>>()
+    private val slots = nestedMap<GUIPosition, Int, Slot?>()
+
+    private val progressionSlots = mutableMapOf<GUIPosition, Int>()
 
     private var isBuilt = false
 
@@ -38,12 +41,36 @@ abstract class LevelComponent : AutofillComponent() {
 
     abstract val maxLevel: Int
 
+    private fun buildSlot(level: Int) = slot { player, menu ->
+        getLevelItem(
+            player,
+            menu,
+            level,
+            getLevelState(
+                player,
+                level
+            )
+        )
+    }
+
     override fun getSlotAt(row: Int, column: Int, player: Player, menu: Menu): Slot? {
         if (!isBuilt) {
             build()
         }
 
-        return slots[menu.getPage(player)]?.get(GUIPosition(row, column))
+        val position = GUIPosition(row, column)
+
+        return slots[position].getOrPut(menu.getPage(player)) {
+            val offset = progressionSlots[position] ?: return null
+            val base = (menu.getPage(player) - 1) * levelsPerPage
+            val level = offset + base
+
+            if (level > maxLevel) {
+                null
+            } else {
+                buildSlot(level)
+            }
+        }
     }
 
     private var _levelsPerPage by Delegates.notNull<Int>()
@@ -71,7 +98,6 @@ abstract class LevelComponent : AutofillComponent() {
     private fun build() {
         isBuilt = true
 
-        val progressionSlots = mutableMapOf<Int, GUIPosition>()
 
         var x = 0
         for (row in pattern) {
@@ -89,38 +115,12 @@ abstract class LevelComponent : AutofillComponent() {
                     continue
                 }
 
-                progressionSlots[pos + 1] = GUIPosition(x, y)
+                progressionSlots[GUIPosition(x, y)] = pos + 1
             }
         }
 
         _levelsPerPage = progressionSlots.size
         _pages = ceil(maxLevel.toDouble() / levelsPerPage).toInt()
-
-        for (page in 1..pages) {
-            for ((levelOffset, position) in progressionSlots) {
-                val level = ((page - 1) * levelsPerPage) + levelOffset
-
-                if (level > maxLevel) {
-                    continue
-                }
-
-                val pageSlots = slots[page] ?: mutableMapOf()
-
-                pageSlots[position] = slot { player, menu ->
-                    getLevelItem(
-                        player,
-                        menu,
-                        level,
-                        getLevelState(
-                            player,
-                            level
-                        )
-                    )
-                }
-
-                slots[page] = pageSlots
-            }
-        }
     }
 
     fun getPageOf(level: Int): Int {
